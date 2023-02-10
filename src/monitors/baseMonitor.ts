@@ -40,5 +40,5 @@ export default abstract class BaseMonitor {
     );
   }
 
-  abstract startMonitoring(callback: (log: any) => void): Promise<void>;
+  abstract startMonitoring(callback: (sale: any) => void): Promise<void>;
 }

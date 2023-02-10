@@ -9,9 +9,8 @@ const ABI_CODER = new Web3().eth.abi;
 export const parseFromLog = async (log: Log): Promise<SeaportSale> => {
     const decodedLog = ABI_CODER.decodeLog(ORDERFULFILLED_STRUCT, log.data, log.topics);
 
-    if (!decodedLog) {
+    if (!decodedLog)
         throw new Error(`Unable to decode Seaport logs from ${log.transactionHash}`);
-    }
 
     const offerItems = decodedLog.offer as unknown as SaleItemCatchAll[];
     const considerationItems = decodedLog.consideration as unknown as SaleItemCatchAll[];
@@ -25,7 +24,7 @@ export const parseFromLog = async (log: Log): Promise<SeaportSale> => {
 
 const parseFromStandardLog = async (log: Log, decodedLog: any, offerItems: SaleItemCatchAll[], considerationItems: SaleItemCatchAll[]): Promise<SeaportSale> => {
     const paymentAsset = await resolveTokenInfo(considerationItems[0].token);
-    const paymentTotal =considerationItems.reduce((acc, obj) => acc + parseInt(obj.amount), 0);
+    const paymentTotal = considerationItems.reduce((acc, obj) => acc + parseInt(obj.amount), 0);
 
     const items = await Promise.all(
         offerItems.filter(i => isNftItem(i.itemType))
@@ -48,7 +47,7 @@ const parseFromStandardLog = async (log: Log, decodedLog: any, offerItems: SaleI
 //Could be bids or complex multi-contract interactions
 const parseFromAdvancedLog = async (log: Log, decodedLog: any, offerItems: SaleItemCatchAll[], considerationItems: SaleItemCatchAll[]): Promise<SeaportSale> => {
     const seller = await resolveTransactionSender(log.transactionHash);
-    const buyer =  considerationItems.find(i => isNftItem(i.itemType))?.recipient as string;
+    const buyer = considerationItems.find(i => isNftItem(i.itemType))?.recipient as string;
 
     const paymentAsset = await resolveTokenInfo(offerItems[0].token);
     const paymentTotal = offerItems.reduce((acc, obj) => acc + parseInt(obj.amount), 0);
